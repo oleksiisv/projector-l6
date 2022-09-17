@@ -4,11 +4,21 @@ According to Similarweb statistics we have over 6.6 billions of visits per month
 
 [https://www.similarweb.com/website/instagram.com/#ranking](https://www.similarweb.com/website/instagram.com/#ranking)
 
+### Load balancer
+
+**SPOFs:** Single instance 
+
+**Bottlenecks:** network
+
+### Web server
+
+**SPOFs:** Single server. Solution: autoscale group
+
+**Bottlenecks:** CPU, network. Autoscaling will also help. 
 
 ## Services:
 
 I decided to split the system to multiple services:
-
 
 * **Timeline Service** – responsible for the displayed timeline data.
 * **Fan Out Service** – responsible for updating followers’ timelines
@@ -22,6 +32,8 @@ Read And Write APIs are responsible for Read and Write operations respectfully.
 
 **SPOFs:** At the service level, a SPOF for each service is it’s operability. To avoid such SPOF we need to keep each service within an autoscale group and keep tracking the instances’ health In case of any issues – launch new instances.
 
+**Bottlenecks:** For each service the bottleneck could be CPU load, using autoscaling groups and adding new instances may help to resolve them. 
+
 
 ## Storage:
 
@@ -32,6 +44,10 @@ Posts, users data and comments are stored in separate databases
 For faster loading, recent posts are stored in Memory Cache. (post_id, author_id)
 
 Media (images, videos) are stored in Object Storage
+
+**SPOFs:** Data loss and connection loss (solution: replicas),  
+
+**Bottlenecks:** for MYSQL databases there could be memoty and I/O bottlenecks. Using federation and aplitting posts, users and comments along with splitting write with read replicas should help resolcing bottlenecks. 
 
 ## Architecture diagram
 
